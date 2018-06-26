@@ -30,4 +30,7 @@ c.超级管理员需要设定一个超级动态密码，或者超级算法，只
 
 10、使用git push -u origin master进行第一次的远程关联；之后就可以省略-u，刚完成了所有内容和网上github同步，201806212340
 
-11、
+11、push origin之前，需要先将项目进行关联
+git remote add origin git@github.com:paradixrain/wechatAssistant
+
+
