@@ -229,8 +229,7 @@ def Ryan_replyText(msg):
     
     print('暂停点7')
     if(usermode == TLSTATE['SHUT']):
-        reply ='图灵机关闭，可使用chmod开启'
-        return reply
+        return
     
     print('暂停点13，图灵机模式')
     if(usermode == TLSTATE['TLING']):
@@ -317,14 +316,20 @@ def Ryan_replyText(msg):
                     reply = revokeUser(aculist, USERLIST_FILE, mycommands[3], mycommands[1].upper())
         elif(mycommands[0].upper() == 'UPDATEEMAIL'):
             print('暂停点29，更新邮箱')
-            if((arglen !=2) and mycommands[1].find('@')==False):
-                reply='参数错误，请检查命令和邮箱地址'
+            if(mycommands[1].find('@')==False):
+                reply='邮箱错误，请检查邮箱地址'
                 logger_default.info(reply)
             elif(checkprivilege.checkPri(userprivilege,'UPDATEEMAIL')==False):
                 reply = 'UPDATEEMAIL 权限不足'
             else:
-                updateemail(aculist, USERLIST_FILE, fromuser, mycommands[1])
-                reply='邮箱更新完成'
+                if((arglen==1) or (arglen>=4)):
+                    reply='参数数量不对'
+                elif(arglen==2):
+                    updateemail(aculist, USERLIST_FILE, fromuser, mycommands[1])
+                    reply='邮箱更新完成'
+                else:
+                    updateemail(aculist, USERLIST_FILE, mycommands[2], mycommands[1])
+                    reply='邮箱更新完成'
         else:
             pass
         return reply
