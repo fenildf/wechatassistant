@@ -24,14 +24,14 @@ def listUser(aculist, remark=None):
     logger_usercmd.debug(reply)
     return reply
 
-def addUser(aculist, USERLIST_FILE, remark, privilege=None, mode=None):
+def addUser(aculist, USERLIST_FILE, remark, privilege=None, mode=None, email=None):
     try:
         from itchat import search_friends
         searchresult=search_friends(remarkName=remark)
         print('adduser stop1')
         for a in aculist:
             print(a.remark)
-        newuser=user.AcceptUser(remark, '', searchresult[0]['UserName'], privilege, mode)
+        newuser=user.AcceptUser(remark, '', searchresult[0]['UserName'], privilege, mode, email)
         aculist.append(newuser)
         print('adduser stop2')
         for a in aculist:
@@ -88,7 +88,13 @@ def grantUser(aculist, USERLIST_FILE, remark, privilege=None):
                 else:
                     #以数值表示的权限
                     try:
-                        aculist[index].privilege=(aculist[index].privilege | int(privilege))
+                        print('aculist[index].privilege:')
+                        print(type(aculist[index].privilege))
+                        print(aculist[index].privilege)
+                        print('privilege:')
+                        print(type(privilege))
+                        print(privilege)
+                        aculist[index].privilege=(aculist[index].privilege | int(privilege,16))
                     except Exception as e:
                         logger_usercmd.error(e)
                         return 'grant error'
@@ -142,3 +148,24 @@ def revokeUser(aculist, USERLIST_FILE, remark, privilege=None):
     reply = 'revokeUser' + remark + 'with privilege:' + str(privilege)
     logger_usercmd.info(reply)
     return reply
+
+
+
+def updateemail(aculist, USERLIST_FILE, remark, NEWEMAIL):
+    try:
+        print('updateemail stop1')
+        for index in range(len(aculist)):
+            if( aculist[index].remark == remark):
+                print('updateemail stop2')
+                logger_usercmd.info('updateemail' + remark + 'FOUND')
+                aculist[index].email = NEWEMAIL
+                break
+        with open(USERLIST_FILE,'wb') as f:
+            print('updateemail stop3')
+            pickle.dump(aculist, f)
+            f.close()
+    except Exception as e:
+        print('updateemail stop3')
+        logger_usercmd.ERROR(e)
+    logger_usercmd.info('updateemail ' + remark +' FINISHED')
+    return

@@ -239,7 +239,7 @@ def Ryan_replyText(msg):
     
     print('暂停点14，命令模式')
     if(usermode == TLSTATE['COMMD']):
-        from commands.usercmd import addUser,delUser,revokeUser
+        from commands.usercmd import addUser,delUser,revokeUser,updateemail
         if( mycommands[0].upper() == 'LISTUSER' ):
             print('暂停点18，命令模式')
             if checkprivilege.checkPri(userprivilege,'LISTUSER'):
@@ -262,12 +262,12 @@ def Ryan_replyText(msg):
             if (arglen != 2):
                 reply = 'ADDUSER 参数不足'
             elif checkprivilege.checkPri(userprivilege,'ADDUSER'):
-                addUser(aculist, USERLIST_FILE, mycommands[1], allprivileges['GP_TLING'], TLSTATE['SHUT'],'null')
+                addUser(aculist, USERLIST_FILE, mycommands[1], allprivileges['GP_TLING'], TLSTATE['SHUT'])
                 #默认值给图灵机权限，且图灵机是关闭状态
             else:
                 reply = 'ADDUSER 权限不足'
         elif(mycommands[0].upper() == 'DELUSER' ):
-            print('暂停点25，命令模式')
+            print('暂停点251，删除模式')
             if (arglen != 2):
                 reply = 'DELUSER 参数不对'
             elif checkprivilege.checkPri(userprivilege,'DELUSER'):
@@ -278,7 +278,7 @@ def Ryan_replyText(msg):
         elif(mycommands[0].upper() == 'GRANT' ):
             print('暂停点26，授权模式')
             if( (arglen != 4) and (mycommands[2].upper()!='TO') ):
-                reply = 'GRANT 参数不对，应为grant 权限 to somebody'
+                reply = mycommands[0] +',' +mycommands[1] +','+mycommands[2] +','+mycommands[3] +'GRANT 参数不对，应为grant 权限 to somebody'
             elif(checkprivilege.checkPri(userprivilege,'ALL')==False):
                 #grant只有超管能做
                 reply = 'GRANT 权限不足，只有超管能回收'
@@ -294,7 +294,7 @@ def Ryan_replyText(msg):
                     return reply
                 else:
                     #用户在aculist中
-                    reply = grantUser(aculist, USERLIST_FILE, mycommands[3], mycommands[1].upper())
+                    reply = grantUser(aculist, USERLIST_FILE, mycommands[3], mycommands[1])
             pass
         elif(mycommands[0].upper() == 'REVOKE'):
             print('暂停点28，收回权限')
@@ -315,6 +315,16 @@ def Ryan_replyText(msg):
                 else:
                     #用户在aculist中
                     reply = revokeUser(aculist, USERLIST_FILE, mycommands[3], mycommands[1].upper())
+        elif(mycommands[0].upper() == 'UPDATEEMAIL'):
+            print('暂停点29，更新邮箱')
+            if((arglen !=2) and mycommands[1].find('@')==False):
+                reply='参数错误，请检查命令和邮箱地址'
+                logger_default.info(reply)
+            elif(checkprivilege.checkPri(userprivilege,'UPDATEEMAIL')==False):
+                reply = 'UPDATEEMAIL 权限不足'
+            else:
+                updateemail(aculist, USERLIST_FILE, fromuser, mycommands[1])
+                reply='邮箱更新完成'
         else:
             pass
         return reply
