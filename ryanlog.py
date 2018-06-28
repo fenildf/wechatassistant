@@ -25,6 +25,7 @@ logger_filemsg = logging.getLogger('filemsg')
 logger_updateacu = logging.getLogger('updateacu')
 logger_turling = logging.getLogger('turling')
 logger_usercmd = logging.getLogger('usercmd')
+logger_email = logging.getLogger('email')
 
 # DEBUG 日志输出
 logger_default.info(u'日志模块加载开始')

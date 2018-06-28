@@ -22,7 +22,8 @@ allprivileges={
 'LISTUSER':             0x0800,                #列示用户
 'CHMOD COMMD':          0x1000,                #命令模式
 'GRANT':                0X2000,                #授权用户    
-'REVOKE':               0X4000,                #收回用户权限    
+'REVOKE':               0x4000,                #收回用户权限
+'CHMOD EMAIL':          0x8000,                 #自动回复邮件模式    
 'GP_TLING':             0x000000000111,               #切换图灵及关闭图灵机权限
 'GP_COMMD':             0x000000000F80,               #使用LISTMOD至LISTUSER的权限
 }

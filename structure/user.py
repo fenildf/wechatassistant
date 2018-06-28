@@ -3,14 +3,14 @@
 #定义用户类型
 class AcceptUser(object):
     '''
-        用户权限对象，一共4列
-        uid,    remark,     username,    privilege,    mode
-        uid(不是所有用户都有),    备注,        用户名(每次更新),     权限清单，以一串01表示是否有权限，    模式
+        用户权限对象，一共有
+        uid,    remark,     username,    privilege,    mode，    EMAIL
+        uid(不是所有用户都有),    备注,        用户名(每次更新),     权限清单，以一串01表示是否有权限，    模式， 邮箱
         全都是string类型
     '''
-    __slots__=('uid', 'remark', 'username', 'privilege', 'mode')
+    __slots__=('uid', 'remark', 'username', 'privilege', 'mode', 'EMAIL')
     
-    def __init__(self, remark, uid, username, privilege, mode ):
+    def __init__(self, remark, uid, username, privilege, mode, EMAIL):
         '''
             初始化，根据slots的限制，只允许有4列
         '''
@@ -20,12 +20,19 @@ class AcceptUser(object):
         self.username = username
         self.privilege = privilege
         self.mode = mode
+        self.EMAIL = EMAIL
     
     def updateUid(self,uid):
         '''
             更新uid
         '''
         self.uid = uid
+        
+    def updateEMAIL(self,EMAIL):
+        '''
+            更新uid
+        '''
+        self.EMAIL = EMAIL
         
     def updateUsername(self,username):
         '''

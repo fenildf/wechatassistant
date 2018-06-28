@@ -1,4 +1,4 @@
-# _*_ coding=utf8
+# _*_ coding: UTF-8 _*_
 import os
 import sys
 import itchat
@@ -39,10 +39,15 @@ import configparser
 ryanconfig = configparser.ConfigParser()
 ryanconfig.read('config/main.conf')
 SYSTEM_TYPE = ryanconfig['DEFAULT'].get('SYSTEM_TYPE')
+SMTPADDR = ryanconfig['DEFAULT'].get('SMTPADDR')
+SENDADDR = ryanconfig['DEFAULT'].get('SENDADDR')
+SMTPPSWD = ryanconfig['DEFAULT'].get('SMTPPSWD')
 if(SYSTEM_TYPE == 'WIN64'):
     USERLIST_FILE = ryanconfig['WINDIR'].get('USERLIST_FILE')
+    RYAN_ROOT_DIR = ryanconfig['WINDIR'].get('RYAN_ROOT_DIR')
 elif(SYSTEM_TYPE == 'LINUX'):
     USERLIST_FILE = ryanconfig['LINUXDIR'].get('USERLIST_FILE')
+    RYAN_ROOT_DIR = ryanconfig['LINUXDIR'].get('RYAN_ROOT_DIR')
 else:
     print('ohter os')
 
@@ -62,7 +67,7 @@ if file_exists == False:
     with open(USERLIST_FILE,'wb') as f:
         defaultline=user.AcceptUser('Roronoa Ryan','1146321620',
                                     'null',allprivileges['ALL'],
-                                    TLSTATE['SHUT'])
+                                    TLSTATE['SHUT'],'snowluxury@qq.com')
         #defaultline.printself()
         aculist.append(defaultline)
         pickle.dump(aculist, f)
@@ -142,7 +147,7 @@ def Ryan_replyText(msg):
         usermode = None
         userprivilege = None
     except:
-        logger_textmsg.debug("Fail to get msg elements")
+        logger_textmsg.error("Fail to get msg elements")
         return
     
     print('暂停点3')
@@ -194,7 +199,8 @@ def Ryan_replyText(msg):
                                   'OSCMMD',
                                   'COMMD',
                                   'COMP', 
-                                  'STDY'])):
+                                  'STDY',
+                                  'EMAIL'])):
         logger_default.info(u'chmod begins')
         if(checkprivilege.checkPri(userprivilege, UserMessage.upper())):
             print('暂停点8')
@@ -216,6 +222,7 @@ def Ryan_replyText(msg):
         'COMMD' ,
         'COMP'  ,
         'STDY'  ,
+        'EMAIL' ,
         当前模式是：
         ''' + usermode + ',当前权限是：' + str(userprivilege)
         return reply
@@ -255,7 +262,7 @@ def Ryan_replyText(msg):
             if (arglen != 2):
                 reply = 'ADDUSER 参数不足'
             elif checkprivilege.checkPri(userprivilege,'ADDUSER'):
-                addUser(aculist, USERLIST_FILE, mycommands[1], allprivileges['GP_TLING'], TLSTATE['SHUT'])
+                addUser(aculist, USERLIST_FILE, mycommands[1], allprivileges['GP_TLING'], TLSTATE['SHUT'],'null')
                 #默认值给图灵机权限，且图灵机是关闭状态
             else:
                 reply = 'ADDUSER 权限不足'
@@ -334,7 +341,110 @@ itchat.send('LuLu started from ' + SYSTEM_TYPE,toUserName=aculist[0].username)
 
 #import filehandler
 #开始处理文件类型
-
+@itchat.msg_register(itchat.content.ATTACHMENT, isFriendChat=True, isGroupChat=False)
+def Ryan_replyAttachment(msg):
+    print(msg)
+    try:
+        toUser = msg['ToUserName']
+        NickName = msg['User']['NickName']
+        fromuser = msg['FromUserName']
+        attachfile = msg['FileName']
+        usermode = None
+        userprivilege = None
+        emailAddr =None
+    except:
+        print("Fail to get msg elements")
+        logger_default.error(u'抽取附件msg失败..')
+        return
+    
+    Receive_msg = NickName + ',id: ' + fromuser + ' send file: ' + attachfile
+    logger_default.info(Receive_msg)
+    
+    #如果是自己发给别人的，则不响应
+    '''为了调试，开启自己发送给自己
+    if( (fromuser == aculist[0].username) and (toUser != aculist[0].username) ):
+        print('not for me')
+        return
+    '''
+    print('暂停点file : 4')
+    #匹配aculist，找到对应的权限和mode
+    for findex in range(len(aculist)):
+        fuser = aculist[findex]
+        print(fuser.remark)
+        if(fuser.remark == NickName):
+            print('fuser hit')
+            fuser.updateUsername(fromuser)
+            usermode = fuser.mode
+            userprivilege = fuser.privilege
+            emailAddr = fuser.EMAIL
+            break
+        else:
+            pass
+    
+    print('暂停点file : 5')
+    #未找到用户
+    if(usermode == None):
+        print('not listed user')   
+        return
+    
+    #自动处理attahment只有一种场景，自动转发邮箱。
+    #因为与手机收到附件不同，python网页版会自动存储对应文档,所以不需要特地归档
+    if(usermode == TLSTATE['EMAIL']):
+        try:
+            print('暂停点 file : 6')
+            fileloc= RYAN_ROOT_DIR + msg['FileName']
+            msg.download(fileloc)
+            print('暂停点 file : 7')
+            from commands import sendemail
+            subject='从微信转发的邮件'
+            attach= RYAN_ROOT_DIR + attachfile
+            content='''为了防止被判断为垃圾邮件，也是醉了，要加首歌词
+            如果那两个字没有颤抖
+我不会发现我难受
+怎么说出口
+也不过是分手
+如果对于明天没有要求
+牵牵手就像旅游
+成千上万个门口
+总有一个人要先走
+怀抱既然不能逗留
+何不在离开的时候
+一边享受 一边泪流
+十年之前
+我不认识你 你不属于我
+我们还是一样
+陪在一个陌生人左右
+走过渐渐熟悉的街头
+十年之后
+我们是朋友 还可以问候
+只是那种温柔
+再也找不到拥抱的理由
+情人最后难免沦为朋友
+怀抱既然不能逗留
+何不在离开的时候
+一边享受 一边泪流
+十年之前
+我不认识你 你不属于我
+我们还是一样
+陪在一个陌生人左右
+走过渐渐熟悉的街头
+十年之后
+我们是朋友 还可以问候
+只是那种温柔
+再也找不到拥抱的理由
+情人最后难免沦为朋友
+直到和你做了多年朋友
+才明白我的眼泪
+不是为你而流
+也为别人而流 
+    '''
+            print('SMTPADDR:' + SMTPADDR + ',SENDADDR:' + SENDADDR + ',SMTPPSWD:' + SMTPPSWD + ',emailAddr:' + emailAddr +',subject:'+subject)
+            sendemail.send_email(SMTPADDR, SENDADDR, SMTPPSWD, emailAddr, subject, content, attach)
+        except Exception as e:
+            logger_default.error(e)
+    else:
+        logger_default.info('不是归档模式，不处理')
+    return
+    
 itchat.run()
-
 logger_default.info(u'主进程结束')
