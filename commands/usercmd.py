@@ -12,7 +12,7 @@ def listUser(aculist, remark=None):
         for acu in aculist:
             print('acu.remark:' +acu.remark)
             print('acu.mode:' + acu.mode)
-            reply += acu.remark + ':' + str(acu.mode) + ',' +str(acu.privilege)+ '\n'
+            reply += acu.remark + ':' + str(acu.mode) + ',' +str(acu.privilege)+',' +str(acu.EMAIL)+ '\n'
     else:
         print('listuser stop2')
         for acu in aculist:
@@ -158,14 +158,14 @@ def updateemail(aculist, USERLIST_FILE, remark, NEWEMAIL):
             if( aculist[index].remark == remark):
                 print('updateemail stop2')
                 logger_usercmd.info('updateemail' + remark + 'FOUND')
-                aculist[index].email = NEWEMAIL
+                aculist[index].EMAIL = NEWEMAIL
                 break
         with open(USERLIST_FILE,'wb') as f:
             print('updateemail stop3')
             pickle.dump(aculist, f)
             f.close()
     except Exception as e:
-        print('updateemail stop3')
+        print('updateemail stop4')
         logger_usercmd.ERROR(e)
     logger_usercmd.info('updateemail ' + remark +' FINISHED')
     return

@@ -327,9 +327,12 @@ def Ryan_replyText(msg):
                 elif(arglen==2):
                     updateemail(aculist, USERLIST_FILE, fromuser, mycommands[1])
                     reply='邮箱更新完成'
-                else:
-                    updateemail(aculist, USERLIST_FILE, mycommands[2], mycommands[1])
-                    reply='邮箱更新完成'
+                else:#admin可以修改别人的邮箱
+                    if(fromuser==aculist[0].username):
+                        updateemail(aculist, USERLIST_FILE, mycommands[2], mycommands[1])
+                        reply='邮箱更新完成'
+                    else:
+                        reply='权限不够'
         else:
             pass
         return reply
