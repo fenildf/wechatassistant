@@ -213,18 +213,34 @@ def Ryan_replyText(msg):
     print('暂停点18，帮助模式')
     if(UserMessage.upper() == 'LISTMOD'):
         print('暂停点21，帮助模式')
-        reply='''使用 chmod + 以下任一模式，进行切换
-        'TLING' ,
-        'SHUT'  ,
-        'OSSYSM',
-        'OSSUBP',
-        'OSCMMD',
-        'COMMD' ,
-        'COMP'  ,
-        'STDY'  ,
-        'EMAIL' ,
+        reply='''
         当前模式是：
-        ''' + usermode + ',当前权限是：' + str(userprivilege)
+        ''' + usermode + ',当前权限是：' + str(hex(userprivilege))
+        return reply
+    
+    print('暂停点181，帮助模式')
+    if(UserMessage.upper() == 'HELP'):
+        print('暂停点182，帮助模式')
+        reply='''
+        1、使用 chmod + 以下任一模式，进行切换
+        'TLING' , ——图灵机消息
+        'SHUT'  , ——关闭图灵机
+        'OSSYSM', ——操作系统命里SYSTEM模式
+        'OSSUBP', ——操作系统命令SUBPROCESS模式
+        'OSCMMD', ——操作命令模式COMMAND模式
+        'COMMD' , ——自定义命令模式
+        'COMP'  , ——公司资料模式
+        'STDY'  , ——学习资料模式
+        'EMAIL' , ——自动邮箱模式
+        2、使用listmod，显示当前模式
+        3、COMMAND模式下，可用命令 []表示必填参数，{}表示可选参数
+            3.1    listuser {备注名}
+            3.2    adduser [备注名]
+            3.3    deluser [备注名]
+            3.4    grant [{0x***格式} 或者 {ADDUSER，DELUSER等具体权限}] to [备注名]  #仅超管
+            3.5    revoke [{0x***格式 }或者 {ADDUSER，DELUSER等具体权限}] to [备注名]  #仅超管
+            3.6    updateemail [邮箱，格式**@**] {备注名，仅 超管}
+        '''
         return reply
     
     print('暂停点7')
@@ -263,6 +279,7 @@ def Ryan_replyText(msg):
             elif checkprivilege.checkPri(userprivilege,'ADDUSER'):
                 addUser(aculist, USERLIST_FILE, mycommands[1], allprivileges['GP_TLING'], TLSTATE['SHUT'])
                 #默认值给图灵机权限，且图灵机是关闭状态
+                reply = 'ADDUSER 完成'
             else:
                 reply = 'ADDUSER 权限不足'
         elif(mycommands[0].upper() == 'DELUSER' ):
@@ -328,29 +345,45 @@ def Ryan_replyText(msg):
                     updateemail(aculist, USERLIST_FILE, fromuser, mycommands[1])
                     reply='邮箱更新完成'
                 else:#admin可以修改别人的邮箱
-                    if(fromuser==aculist[0].username):
+                    if(checkprivilege.checkPri(userprivilege,'ALL')==True):
                         updateemail(aculist, USERLIST_FILE, mycommands[2], mycommands[1])
                         reply='邮箱更新完成'
                     else:
                         reply='权限不够'
         else:
-            pass
+            reply='undefined command'
         return reply
+    elif(usermode == TLSTATE['OSSYSM']):
+        print('暂停点15，操作系统命令模式1')
+        reply = os.system(UserMessage)
+        logger_default.info('OSSYSM EXECUTE' + UserMessage)
+        logger_default.info(reply)
+        return reply 
+    elif(usermode == TLSTATE['OSSUBP']):
+        print('暂停点16，操作系统命令模式2')
+        p =  subprocess.Popen(UserMessage, shell=True, stdout=PIPE, stderr=PIPE)
+        p.wait()
+        reply = p.stdout.read()
+        logger_default.info('OSSUBP EXECUTE' + UserMessage)
+        logger_default.info(reply)
+        return reply
+    elif(usermode == TLSTATE['OSCMMD']):
+        print('暂停点17，操作系统命令模式3')
+        cmdstatus, cmdoutput = subprocess.getstatusoutput(UserMessage)
+        if (cmdstatus !=0):
+            reply = '执行失败' + str(cmdstatus)
+        else:
+            reply = cmdoutput
+        logger_default.info('OSCMMD EXECUTE' + UserMessage)
+        logger_default.info(reply)
+        return reply
+    elif(usermode == TLSTATE['COMP']):
+        pass
+    elif(usermode == TLSTATE['STDY']):
+        pass
+    else:
+        pass
     
-    print('暂停点15，操作系统命令模式')
-    if(usermode == TLSTATE['OSSYSM']):
-        return get_TR_response(UserMessage)
-    
-    print('暂停点16，公司资料模式')
-    if(usermode == TLSTATE['COMP']):
-        return get_TR_response(UserMessage)
-    
-    print('暂停点17，学习资料模式')
-    if(usermode == TLSTATE['STDY']):
-        return get_TR_response(UserMessage)
-    #以下为找到用户的情况，且不是chmod命令的情况
-    #命令与权限匹配，看是否允许执行
-    # 图灵机模式不判断，RYAN_TL_STATE_TRLN
     return reply
 
 #发送启动消息

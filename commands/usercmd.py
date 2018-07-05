@@ -12,7 +12,7 @@ def listUser(aculist, remark=None):
         for acu in aculist:
             print('acu.remark:' +acu.remark)
             print('acu.mode:' + acu.mode)
-            reply += acu.remark + ':' + str(acu.mode) + ',' +str(acu.privilege)+',' +str(acu.EMAIL)+ '\n'
+            reply += acu.remark + ':' + str(acu.mode) + ',' +str(hex(acu.privilege))+',' +str(acu.EMAIL)+ '\n'
     else:
         print('listuser stop2')
         for acu in aculist:
